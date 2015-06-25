@@ -1,0 +1,9 @@
+target
+build
+bin
+dist
+testfiles
+lib
+.project
+.classpath
+.settings/*
