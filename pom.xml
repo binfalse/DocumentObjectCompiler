@@ -3,7 +3,7 @@
 
 	<groupId>de.unirostock.sems</groupId>
 	<artifactId>DocumentObjectCompiler</artifactId>
-	<version>0.6.2</version>
+	<version>0.6.3</version>
 	<packaging>jar</packaging>
 
 	<name>DocumentObjectCompiler</name>
