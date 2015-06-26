@@ -30,6 +30,7 @@ import org.apache.taverna.robundle.manifest.PathMetadata;
 public class Compiler
 {
 	
+	public static  boolean DIE = true;
 	public static final String ROOT_DOC_ANNOTAION = "http://binfalse.de#rootdocument";
 	
 	/**
@@ -50,7 +51,8 @@ public class Compiler
 		
 		System.out.println (" DOCUMENT_OBJECT");
 		System.out.println ("\tDOCUMENT_OBJECT\tthe research object containing the latex project");
-		System.exit (2);
+		if (DIE)
+			System.exit (2);
 	}
 	
 	/**
@@ -137,8 +139,11 @@ public class Compiler
 		throws IOException,
 			InterruptedException
 	{
-		if (args.length != 1)
+		if (args == null || args.length != 1)
+		{
 			die ("expect exactly one argument: the document object");
+			return;
+		}
 		
 		// create temp directory to extract the archive
 		Path tmpDir = Files.createTempDirectory ("documentObject");
@@ -147,7 +152,10 @@ public class Compiler
 		// read document object and extract it
 		Path file = new File (args[0]).toPath ();
 		if (!Files.exists (file))
+		{
 			die ("file " + file + " does not exist");
+			return;
+		}
 		
 		System.out.println (">>> extracting research object " + file + " to "
 			+ tmpDir);
@@ -158,9 +166,18 @@ public class Compiler
 		}
 		
 		if (texFile == null || !texFile.endsWith (".tex"))
+		{
 			die ("could not find valid tex file (" + texFile + ")");
+			return;
+		}
 		while (texFile.startsWith ("/"))
 			texFile = texFile.substring (1);
+		
+		if (!Files.exists (tmpDir.resolve (texFile)))
+		{
+			die ("root tex file does not exist (" + texFile + ")");
+			return;
+		}
 		
 		Path logFile = file.getParent ().resolve (
 			texFile.substring (0, texFile.length () - 4) + ".outlog");
@@ -177,7 +194,9 @@ public class Compiler
 			//System.exit (0);
 		}
 		else
+		{
 			die ("compiling document object failed");
-		
+			return;
+		}
 	}
 }
