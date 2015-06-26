@@ -116,7 +116,6 @@ public class Compiler
 		throws IOException,
 			InterruptedException
 	{
-		args = new String[] { "/tmp/ro-input.zip" };
 		if (args.length != 1)
 			die ("expect exactly one argument: the document object");
 		
