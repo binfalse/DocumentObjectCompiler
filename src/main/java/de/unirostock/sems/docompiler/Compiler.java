@@ -15,6 +15,7 @@ import java.util.List;
 import org.apache.taverna.robundle.Bundle;
 import org.apache.taverna.robundle.Bundles;
 import org.apache.taverna.robundle.manifest.Manifest;
+import org.apache.taverna.robundle.manifest.PathAnnotation;
 import org.apache.taverna.robundle.manifest.PathMetadata;
 
 
@@ -28,6 +29,8 @@ import org.apache.taverna.robundle.manifest.PathMetadata;
  */
 public class Compiler
 {
+	
+	public static final String ROOT_DOC_ANNOTAION = "http://binfalse.de#rootdocument";
 	
 	/**
 	 * Die. Stop the execution delivering a last message.
@@ -55,9 +58,10 @@ public class Compiler
 	 *
 	 * @param bundle the research object
 	 * @param targetDir the directory to write to
+	 * @return the path to the root latex file in the document
 	 * @throws IOException the IO exception
 	 */
-	public static final void extractResearchObject (Bundle bundle, Path targetDir) throws IOException
+	public static final String extractResearchObject (Bundle bundle, Path targetDir) throws IOException
 	{
 			Manifest mf = bundle.getManifest ();
 			List<PathMetadata> aggr = mf.getAggregates ();
@@ -71,6 +75,11 @@ public class Compiler
 				Files.createDirectories (target.getParent ());
 				Files.copy (pm.getFile (), target);
 			}
+			List<PathAnnotation> annotations = mf.getAnnotations ();
+			for (PathAnnotation annotation : annotations)
+				if (annotation.getContent ().toString ().equals (ROOT_DOC_ANNOTAION))
+				 return annotation.getAbout ().toString ();
+			return null;
 	}
 	
 	
@@ -142,14 +151,16 @@ public class Compiler
 		
 		System.out.println (">>> extracting research object " + file + " to "
 			+ tmpDir);
+		String texFile = null;
 		try (Bundle bundle = Bundles.openBundleReadOnly (file))
 		{
-			extractResearchObject (bundle, tmpDir);
+			texFile = extractResearchObject (bundle, tmpDir);
 		}
 		
-		String texFile = "document.tex";
 		if (texFile == null || !texFile.endsWith (".tex"))
 			die ("could not find valid tex file (" + texFile + ")");
+		while (texFile.startsWith ("/"))
+			texFile = texFile.substring (1);
 		
 		Path logFile = file.getParent ().resolve (
 			texFile.substring (0, texFile.length () - 4) + ".outlog");
