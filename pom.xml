@@ -3,7 +3,7 @@
 
 	<groupId>de.unirostock.sems</groupId>
 	<artifactId>DocumentObjectCompiler</artifactId>
-	<version>0.3.2</version>
+	<version>0.3.3</version>
 	<packaging>jar</packaging>
 
 	<name>DocumentObjectCompiler</name>
@@ -22,7 +22,7 @@
 			</roles>
 		</developer>
 	</developers>
-	
+
 	<licenses>
 		<license>
 			<name>GNU Lesser General Public License (GPL)</name>
@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -43,7 +43,7 @@
 			<version>0.15.1-incubating-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
-	
+
 	<repositories>
 		<repository>
 			<id>apache.snapshots</id>
@@ -54,7 +54,7 @@
 			</releases>
 		</repository>
 	</repositories>
-	
+
 	<build>
 		<extensions>
 			<!-- enables ssh/scp support for maven deployment -->

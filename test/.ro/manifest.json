@@ -1,0 +1,44 @@
+{
+    "@context":
+    [
+    "https://w3id.org/bundle/context"
+    ],
+    "id": "/",
+    "manifest":  "manifest.json",
+    "createdBy":
+    {
+        "uri":     "http://binfalse.de",
+        "orcid":   "http://orcid.org/0000-0003-4519-7030",
+        "name":    "Martin Scharm",
+        "foaf:homepage":
+        {
+            "@id": "http://binfalse.de"
+        }
+    },
+    "aggregates":
+    [
+    {
+        "uri":      "/test.tex",
+        "mediatype": "text/x-tex",
+        "createdBy":
+        {
+            "name":    "Martin Scharm"
+        }
+    },
+    {
+        "uri":      "/test-invalid.tex",
+        "mediatype": "text/x-tex",
+        "createdBy":
+        {
+            "name":    "Martin Scharm"
+        }
+    }
+    ],
+		"annotations":
+		[
+		{
+			"about": "/test.tex",
+			"content": "http://binfalse.de#rootdocument"
+		}
+		]
+}
