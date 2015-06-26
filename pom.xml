@@ -3,7 +3,7 @@
 
 	<groupId>de.unirostock.sems</groupId>
 	<artifactId>DocumentObjectCompiler</artifactId>
-	<version>0.6</version>
+	<version>0.6.1</version>
 	<packaging>jar</packaging>
 
 	<name>DocumentObjectCompiler</name>
@@ -56,6 +56,25 @@
 		</repository>
 	</repositories>
 
+	<distributionManagement>
+		<downloadUrl>http://mvn.sems.uni-rostock.de</downloadUrl>
+		<snapshotRepository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>sems-maven-repository</id>
+			<name>SEMS Maven Release Repository</name>
+			<url>scp://sems.uni-rostock.de:/home/stuff/web/mvn/snapshots/</url>
+			<layout>default</layout>
+		</snapshotRepository>
+
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>sems-maven-repository</id>
+			<name>Enterprise Systems Maven Repository</name>
+			<url>scp://sems.uni-rostock.de:/home/stuff/web/mvn/releases/</url>
+			<layout>default</layout>
+		</repository>
+	</distributionManagement>
+
 	<build>
 		<extensions>
 			<!-- enables ssh/scp support for maven deployment -->
@@ -105,5 +124,49 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<!-- deployment profile -->
+		<profile>
+			<id>release</id>
+			<!-- build plugin configuration for the deploy -->
+			<!-- not necessary to always include the sources and javadocs -->
+			<build>
+				<plugins>
+					<!-- attach sources -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+
+						<configuration>
+							<attach>true</attach>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- attach javadoc -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
