@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -35,6 +37,16 @@ public class Compiler
 	public static final void die (String message)
 	{
 		System.err.println ("!!! " + message);
+		System.err.println ();
+		
+		String cmd = System.getProperty("sun.java.command");
+		if (cmd.endsWith (".jar"))
+			System.out.print ("USAGE: java -jar " + cmd);
+		else
+			System.out.print ("USAGE: java -classpath CLASSPATH " + cmd);
+		
+		System.out.println (" DOCUMENT_OBJECT");
+		System.out.println ("\tDOCUMENT_OBJECT\tthe research object containing the latex project");
 		System.exit (2);
 	}
 	
