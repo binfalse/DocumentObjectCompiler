@@ -1,3 +1,22 @@
+/**
+ * Copyright © 2015 Martin Scharm <martin@binfalse.de>
+ * 
+ * This file is part of the DocumentObjectCompiler.
+ * 
+ * The DocumentObjectCompiler is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ * 
+ * CombineExt is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with DocumentObjectCompiler. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package de.unirostock.sems.docompiler;
 
 import java.io.BufferedReader;
@@ -6,8 +25,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -23,90 +40,108 @@ import org.apache.taverna.robundle.manifest.PathMetadata;
 /**
  * Compiler for Document Objects.
  * 
- * This compiler takes a <a href="http://www.researchobject.org/">Research Object</a> and compiles it into a PDF document.
+ * This compiler takes a <a href="http://www.researchobject.org/">Research
+ * Object</a> and compiles it into a PDF document.
  * 
  * @author Martin Scharm
  */
 public class Compiler
 {
 	
-	public static  boolean DIE = true;
-	public static final String ROOT_DOC_ANNOTAION = "http://binfalse.de#rootdocument";
+	/** Should the main die in case of an error? Otherwise the main will just return. */
+	public static boolean				DIE									= true;
+	
+	/** The ROOT_DOC_ANNOTAION, used to identify the root document. */
+	public static final String	ROOT_DOC_ANNOTAION	= "http://binfalse.de#rootdocument";
+	
 	
 	/**
 	 * Die. Stop the execution delivering a last message.
-	 *
-	 * @param message the last message
+	 * 
+	 * @param message
+	 *          the last message
 	 */
 	public static final void die (String message)
 	{
 		System.err.println ("!!! " + message);
 		System.err.println ();
 		
-		String cmd = System.getProperty("sun.java.command");
+		String cmd = System.getProperty ("sun.java.command");
 		if (cmd.endsWith (".jar"))
 			System.out.print ("USAGE: java -jar " + cmd);
 		else
 			System.out.print ("USAGE: java -classpath CLASSPATH " + cmd);
 		
 		System.out.println (" DOCUMENT_OBJECT");
-		System.out.println ("\tDOCUMENT_OBJECT\tthe research object containing the latex project");
+		System.out
+			.println ("\tDOCUMENT_OBJECT\tthe research object containing the latex project");
 		if (DIE)
 			System.exit (2);
 	}
 	
+	
 	/**
 	 * Extract the files of a research object to a directory on the disk.
-	 *
-	 * @param bundle the research object
-	 * @param targetDir the directory to write to
+	 * 
+	 * @param bundle
+	 *          the research object
+	 * @param targetDir
+	 *          the directory to write to
 	 * @return the path to the root latex file in the document
-	 * @throws IOException the IO exception
+	 * @throws IOException
+	 *           the IO exception
 	 */
-	public static final String extractResearchObject (Bundle bundle, Path targetDir) throws IOException
+	public static final String extractResearchObject (Bundle bundle,
+		Path targetDir) throws IOException
 	{
-			Manifest mf = bundle.getManifest ();
-			List<PathMetadata> aggr = mf.getAggregates ();
-			for (PathMetadata pm : aggr)
-			{
-				if (pm.getFile () == null)
-					continue;
-				System.out.println ("  > " + pm.getFile ());
-				String cur = pm.getFile ().toString ();
-				Path target = targetDir.resolve (cur.substring (1));
-				Files.createDirectories (target.getParent ());
-				Files.copy (pm.getFile (), target);
-			}
-			List<PathAnnotation> annotations = mf.getAnnotations ();
-			for (PathAnnotation annotation : annotations)
-				if (annotation.getContent ().toString ().equals (ROOT_DOC_ANNOTAION))
-				 return annotation.getAbout ().toString ();
-			return null;
+		Manifest mf = bundle.getManifest ();
+		List<PathMetadata> aggr = mf.getAggregates ();
+		for (PathMetadata pm : aggr)
+		{
+			if (pm.getFile () == null)
+				continue;
+			System.out.println ("  > " + pm.getFile ());
+			String cur = pm.getFile ().toString ();
+			Path target = targetDir.resolve (cur.substring (1));
+			Files.createDirectories (target.getParent ());
+			Files.copy (pm.getFile (), target);
+		}
+		List<PathAnnotation> annotations = mf.getAnnotations ();
+		for (PathAnnotation annotation : annotations)
+			if (annotation.getContent ().toString ().equals (ROOT_DOC_ANNOTAION))
+				return annotation.getAbout ().toString ();
+		return null;
 	}
 	
 	
 	/**
 	 * Compile the latex project to a pdf file.
-	 *
-	 * @param sourceDirectory the directory containing the latex project
-	 * @param texFile the main latex file
-	 * @param logFile the log file
+	 * 
+	 * @param sourceDirectory
+	 *          the directory containing the latex project
+	 * @param texFile
+	 *          the main latex file
+	 * @param logFile
+	 *          the log file
 	 * @return true, if compile latex
-	 * @throws IOException the IO exception
-	 * @throws InterruptedException the interrupted exception
+	 * @throws IOException
+	 *           the IO exception
+	 * @throws InterruptedException
+	 *           the interrupted exception
 	 */
-	public static final boolean compileLatex (Path sourceDirectory, String texFile, Path logFile) throws IOException, InterruptedException
+	public static final boolean compileLatex (Path sourceDirectory,
+		String texFile, Path logFile) throws IOException, InterruptedException
 	{
 		// create a latexmk process
-		// latexmk will run the pdflatex command multiple times to make sure all refs are correctly resolved
+		// latexmk will run the pdflatex command multiple times to make sure all
+		// refs are correctly resolved
 		ProcessBuilder pb = new ProcessBuilder (
 			"latexmk",
 			"-pdf",
 			"-f",
 			"-pdflatex=pdflatex -shell-escape -interaction=nonstopmode",
 			texFile)
-			.redirectErrorStream (true)
-			.directory (sourceDirectory.toFile ());
+			.redirectErrorStream (true).directory (sourceDirectory.toFile ());
 		Process p = pb.start ();
 		
 		// read output and write it to the log
@@ -130,10 +165,13 @@ public class Compiler
 	
 	/**
 	 * The main method.
-	 *
-	 * @param args the arguments: |args| = 1 && args[0] must be a file
-	 * @throws IOException the IO exception
-	 * @throws InterruptedException the interrupted exception
+	 * 
+	 * @param args
+	 *          the arguments: |args| = 1 && args[0] must be a file
+	 * @throws IOException
+	 *           the IO exception
+	 * @throws InterruptedException
+	 *           the interrupted exception
 	 */
 	public static void main (String[] args)
 		throws IOException,
@@ -191,7 +229,6 @@ public class Compiler
 			Files.copy (tmpDir.resolve (pdfFile), finalPdf);
 			System.out.println (">>> final pdf will be available in " + finalPdf);
 			System.out.println (">>> compilation done.");
-			//System.exit (0);
 		}
 		else
 		{

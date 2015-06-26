@@ -3,11 +3,12 @@
 
 	<groupId>de.unirostock.sems</groupId>
 	<artifactId>DocumentObjectCompiler</artifactId>
-	<version>0.5</version>
+	<version>0.6</version>
 	<packaging>jar</packaging>
 
 	<name>DocumentObjectCompiler</name>
 	<description>Compiler for DocumentObjects</description>
+	<url>https://github.com/binfalse/DocumentObjectCompiler</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
