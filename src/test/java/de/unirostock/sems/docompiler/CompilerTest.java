@@ -21,7 +21,7 @@ public class CompilerTest
 		// copy the test archive to a temp dir
 		Path tmp = Files.createTempDirectory ("docompiler");
 		Path target = tmp.resolve ("test.zip");
-		Files.copy (Paths.get ("/tmp/text.bundle"), target);
+		Files.copy (Paths.get ("/test/do.bundle"), target);
 		Compiler.main (new String [] {target.toString ()});
 	}
 	
