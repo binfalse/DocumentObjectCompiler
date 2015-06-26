@@ -219,6 +219,8 @@ public class Compiler
 		
 		Path logFile = file.getParent ().resolve (
 			texFile.substring (0, texFile.length () - 4) + ".outlog");
+		if (Files.exists (logFile))
+			die ("log file exists. won't override it: " + logFile);
 		System.out.println (">>> compiler log will be available in " + logFile);
 		String pdfFile = texFile.substring (0, texFile.length () - 4) + ".pdf";
 		
@@ -226,6 +228,8 @@ public class Compiler
 		if (compileLatex (tmpDir, texFile, logFile))
 		{
 			Path finalPdf = file.getParent ().resolve (pdfFile);
+			if (Files.exists (finalPdf))
+				die ("target pdf file exists. won't override it: " + finalPdf);
 			Files.copy (tmpDir.resolve (pdfFile), finalPdf);
 			System.out.println (">>> final pdf will be available in " + finalPdf);
 			System.out.println (">>> compilation done.");
