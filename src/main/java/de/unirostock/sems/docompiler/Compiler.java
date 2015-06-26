@@ -24,51 +24,46 @@ public class Compiler
 	
 	public static final void die (String message)
 	{
-		System.err.println (message);
+		System.err.println ("!!! " + message);
 		System.exit (2);
 	}
 	
 	
     public static void main( String[] args ) throws IOException, InterruptedException
     {
-  		args = new String[] { "/tmp/docompilein/ro-input.zip" };
-  		
   		if (args.length != 1)
   			die ("expect exactly one argument: the document object");
   		
   		// create temp directory to extract the archive
   		Path tmpDir = Files.createTempDirectory ("documentObject");
-  		System.out.println ("tmp is: " + tmpDir);
+  		System.out.println (">>> tmp dir is: " + tmpDir);
   		
   		// read document object and extract it
   		Path file = new File (args[0]).toPath ();
   		if (!Files.exists (file))
   			die ("file " + file + " does not exist");
   		
+  		System.out.println (">>> extracting research object " + file + " to " + tmpDir);
   		try (Bundle bundle = Bundles.openBundle (file))
   		{
   			Manifest mf = bundle.getManifest ();
   			List<PathMetadata> aggr = mf.getAggregates ();
   			for (PathMetadata pm : aggr)
   			{
-  				System.out.println (pm.getFile ());
+  				System.out.println ("  > " + pm.getFile ());
   				String cur = pm.getFile ().toString ();
   				Path target = tmpDir.resolve (cur.substring (1));
   				Files.createDirectories (target.getParent ());
   				Files.copy (pm.getFile (), target);
-  				System.out.println (" #>  " + target);
   			}
   		}
-  		
-  		System.out.println ("look at " + tmpDir);
-  		Thread.sleep (2000);
   		
   		String texFile = "document.tex";
   		if (texFile == null || !texFile.endsWith (".tex"))
   			die ("could not find valid tex file (" + texFile + ")");
   		
   		Path logFile = file.getParent ().resolve (texFile.substring (0, texFile.length () - 4) + ".outlog");
-  		System.out.println ("log will be available in " + logFile);
+  		System.out.println (">>> compiler log will be available in " + logFile);
   		String pdfFile = texFile.substring (0, texFile.length () - 4)+ ".pdf";
   		
   		
@@ -95,8 +90,10 @@ public class Compiler
   		if (p.waitFor () == 0)
   			if (p.exitValue () == 0)
   			{
-  				Files.copy (tmpDir.resolve (pdfFile), file.getParent ().resolve (pdfFile));
-  				System.out.println ("compilation done.");
+  				Path finalPdf = file.getParent ().resolve (pdfFile);
+  				Files.copy (tmpDir.resolve (pdfFile), finalPdf);
+  	  		System.out.println (">>> final pdf will be available in " + finalPdf);
+  				System.out.println (">>> compilation done.");
   				System.exit (0);
   			}
   		die ("compiling document object failed");
