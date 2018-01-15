@@ -1,15 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>de.unirostock.sems</groupId>
+	<groupId>de.uni-rostock.sbi</groupId>
 	<artifactId>DocumentObjectCompiler</artifactId>
-	<version>0.6.3</version>
+	<version>0.6.4</version>
 	<packaging>jar</packaging>
 
 	<name>DocumentObjectCompiler</name>
 	<description>Compiler for DocumentObjects</description>
 	<url>https://github.com/binfalse/DocumentObjectCompiler</url>
-
+	
+	<scm>
+		<url>https://github.com/binfalse/DocumentObjectCompiler</url>
+		<connection>https://github.com/binfalse/DocumentObjectCompiler.git</connection>
+		<developerConnection>scm:git:ssh://github.com:binfalse/DocumentObjectCompiler.git</developerConnection>
+	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -41,49 +46,21 @@
 		<dependency>
 			<groupId>org.apache.taverna.language</groupId>
 			<artifactId>taverna-robundle</artifactId>
-			<version>0.15.1-incubating-SNAPSHOT</version>
+			<version>0.15.1-incubating</version>
 		</dependency>
 	</dependencies>
-
-	<repositories>
-		<repository>
-			<id>apache.snapshots</id>
-			<name>Apache Snapshot Repository</name>
-			<url>http://repository.apache.org/snapshots</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
-	</repositories>
-
 	<distributionManagement>
-		<downloadUrl>http://mvn.sems.uni-rostock.de</downloadUrl>
 		<snapshotRepository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>sems-maven-repository</id>
-			<name>SEMS Maven Release Repository</name>
-			<url>scp://sems.uni-rostock.de:/home/stuff/web/mvn/snapshots/</url>
-			<layout>default</layout>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
-
 		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>sems-maven-repository</id>
-			<name>Enterprise Systems Maven Repository</name>
-			<url>scp://sems.uni-rostock.de:/home/stuff/web/mvn/releases/</url>
-			<layout>default</layout>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
 
 	<build>
-		<extensions>
-			<!-- enables ssh/scp support for maven deployment -->
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh</artifactId>
-				<version>1.0-beta-7</version>
-			</extension>
-		</extensions>
 		<resources>
 			<resource>
 				<targetPath>${project.build.outputDirectory}/res</targetPath>
@@ -122,51 +99,69 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.3</version>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<useReleaseProfile>false</useReleaseProfile>
+					<releaseProfiles>release</releaseProfiles>
+					<goals>deploy</goals>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.7</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<!-- deployment profile -->
-		<profile>
-			<id>release</id>
-			<!-- build plugin configuration for the deploy -->
-			<!-- not necessary to always include the sources and javadocs -->
-			<build>
-				<plugins>
-					<!-- attach sources -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-
-						<configuration>
-							<attach>true</attach>
-						</configuration>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<!-- attach javadoc -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 </project>

@@ -121,6 +121,34 @@ public class CompilerTest
 	
 	
 	/**
+	 * Test valid Document Object.
+	 * 
+	 * @throws IOException
+	 *           the IO exception
+	 * @throws InterruptedException
+	 *           the interrupted exception
+	 */
+	@Test
+	public void testValidDocumentObject () throws IOException, InterruptedException
+	{
+		// some workarounds
+		Logger.getRootLogger ().setLevel (Level.OFF);
+		Compiler.DIE = false;
+		
+		// copy the test archive to a temp dir
+		Path tmp = Files.createTempDirectory ("docompiler");
+		Path target = tmp.resolve ("test.zip");
+		Files.copy (Paths.get ("test/DocumentObject.ro"), target);
+		Compiler.main (new String[] { target.toString () });
+		
+		assertTrue ("expected to obtain a pdf file",
+		Files.exists (tmp.resolve ("document.pdf")));
+		String syserr = errContent.toString ();
+		assertEquals ("did not expect to see an err", 0, syserr.length ());
+	}
+	
+	
+	/**
 	 * Test invalid bundle having an external reference.
 	 * 
 	 * @throws IOException
