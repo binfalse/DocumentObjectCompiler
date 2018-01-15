@@ -167,7 +167,7 @@ public class Compiler
 	 * The main method.
 	 * 
 	 * @param args
-	 *          the arguments: |args| = 1 && args[0] must be a file
+	 *          the arguments: |args| = 1 &amp;&amp; args[0] must be a file
 	 * @throws IOException
 	 *           the IO exception
 	 * @throws InterruptedException
